@@ -44,10 +44,9 @@ Requirements: Python 3.12 or newer.
     python -m venv .venv
     .venv\Scripts\Activate.ps1
     python -m pip install -r requirements-dev.txt
-    genvm-lint check contracts/claim_lens.py
-    genvm-lint typecheck contracts/claim_lens.py
+    .\scripts\check.ps1
 
-The GenVM linter performs fast safety checks and validates the contract against the SDK version declared in its dependency header.
+The local check script runs the GenVM safety/SDK validation and type checker used by the GitHub Actions workflow. It can be used when GitHub does not start hosted jobs.
 
 This repository includes the GenLayer Codex skills for contract authoring, linting, and CLI deployment under .agents/skills. They were installed from the official [GenLayer skills repository](https://github.com/genlayerlabs/skills).
 
