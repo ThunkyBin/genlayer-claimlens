@@ -48,6 +48,8 @@ Requirements: Python 3.12 or newer.
 
 The GenVM linter performs fast safety checks and validates the contract against the SDK version declared in its dependency header.
 
+This repository includes the GenLayer Codex skills for contract authoring, linting, and CLI deployment under .agents/skills. They were installed from the official [GenLayer skills repository](https://github.com/genlayerlabs/skills).
+
 ## Deploy on a GenLayer test network
 
 1. Open the official GenLayer Studio at https://studio.genlayer.com.

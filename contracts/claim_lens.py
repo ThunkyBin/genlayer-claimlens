@@ -50,6 +50,7 @@ class ClaimLens(gl.Contract):
 
         def assess_sources() -> typing.Any:
             evidence = []
+            usable_source_count = 0
             for url in sources_for_review:
                 response = gl.nondet.web.get(url)
                 status_code = response.status_code
@@ -57,6 +58,8 @@ class ClaimLens(gl.Contract):
                 if status_code >= 200 and status_code < 300:
                     try:
                         excerpt = response.body.decode("utf-8")[:_MAX_EXCERPT_LENGTH]
+                        if excerpt.strip():
+                            usable_source_count += 1
                     except Exception:
                         excerpt = ""
                 evidence.append(
@@ -66,6 +69,13 @@ class ClaimLens(gl.Contract):
                         "excerpt": excerpt,
                     }
                 )
+
+            if usable_source_count < 2:
+                return {
+                    "verdict": "INSUFFICIENT",
+                    "rationale": "Fewer than two sources returned usable text.",
+                    "sources_used": usable_source_count,
+                }
 
             prompt = f"""
 You are assessing a public claim using only the supplied source excerpts.
@@ -81,7 +91,6 @@ Source evidence as JSON:
 Return one JSON object with:
 - verdict: exactly SUPPORTED, REFUTED, MIXED, or INSUFFICIENT
 - rationale: a concise explanation of at most 500 characters
-- sources_used: an integer from 0 to {len(sources_for_review)}
 
 Use INSUFFICIENT when fewer than two sources contain relevant evidence, the
 sources conflict without a clear resolution, or the evidence does not directly
@@ -104,16 +113,10 @@ This is research triage, not professional advice.
             if len(rationale) > 500:
                 rationale = rationale[:500]
 
-            sources_used = raw_result.get("sources_used", 0)
-            if not isinstance(sources_used, int):
-                sources_used = 0
-            if sources_used < 0 or sources_used > len(sources_for_review):
-                sources_used = 0
-
             return {
                 "verdict": verdict,
                 "rationale": rationale,
-                "sources_used": sources_used,
+                "sources_used": usable_source_count,
             }
 
         def validators_agree(leader_result: typing.Any) -> bool:

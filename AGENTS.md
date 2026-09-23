@@ -6,3 +6,4 @@
 - Never add custody, payment, or payout behavior without an explicit design review.
 - Before changing the contract, run: genvm-lint check contracts/claim_lens.py
 - Add or update focused direct-mode tests for behavioral changes.
+- Use the project-scoped GenLayer skills in .agents/skills for contract authoring, linting, and deployment guidance.
