@@ -14,3 +14,4 @@ jobs:
           python-version: "3.12"
       - run: python -m pip install -r requirements-dev.txt
       - run: genvm-lint check contracts/claim_lens.py
+      - run: genvm-lint typecheck contracts/claim_lens.py

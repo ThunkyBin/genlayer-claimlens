@@ -5,10 +5,10 @@ import json
 import typing
 
 
-_MAX_CLAIM_LENGTH: u32 = 280
-_MAX_URL_LENGTH: u32 = 2048
-_MAX_SOURCE_COUNT: u32 = 3
-_MAX_EXCERPT_LENGTH: u32 = 6000
+_MAX_CLAIM_LENGTH = 280
+_MAX_URL_LENGTH = 2048
+_MAX_SOURCE_COUNT = 3
+_MAX_EXCERPT_LENGTH = 6000
 
 
 class ClaimLens(gl.Contract):
@@ -57,9 +57,11 @@ class ClaimLens(gl.Contract):
                 excerpt = ""
                 if status_code >= 200 and status_code < 300:
                     try:
-                        excerpt = response.body.decode("utf-8")[:_MAX_EXCERPT_LENGTH]
-                        if excerpt.strip():
-                            usable_source_count += 1
+                        body = response.body
+                        if body is not None:
+                            excerpt = body.decode("utf-8")[:_MAX_EXCERPT_LENGTH]
+                            if excerpt.strip():
+                                usable_source_count += 1
                     except Exception:
                         excerpt = ""
                 evidence.append(

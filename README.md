@@ -45,6 +45,7 @@ Requirements: Python 3.12 or newer.
     .venv\Scripts\Activate.ps1
     python -m pip install -r requirements-dev.txt
     genvm-lint check contracts/claim_lens.py
+    genvm-lint typecheck contracts/claim_lens.py
 
 The GenVM linter performs fast safety checks and validates the contract against the SDK version declared in its dependency header.
 
