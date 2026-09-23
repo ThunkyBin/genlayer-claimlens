@@ -48,6 +48,18 @@ Requirements: Python 3.12 or newer.
 
 The local check script runs the GenVM safety/SDK validation and type checker used by the GitHub Actions workflow. It can be used when GitHub does not start hosted jobs.
 
+## Web interface
+
+The static app is in `frontend/`. It supports read-only assessment lookup and lets a user submit a review through their own EIP-1193 wallet. It never stores wallet keys. Every write requires an explicit confirmation in the app; the wallet shows any required fee before the user approves the transaction.
+
+    cd frontend
+    npm ci
+    npm run dev
+
+To publish without a GitHub Actions runner, build with `npm run build` from `frontend/`. Vite writes the static site to `docs/`; publish the `main` branch's `/docs` directory with GitHub Pages. The checked-in `docs/` output is the published site artifact. The app requires a ClaimLens contract deployed separately on the selected network; this repository does not claim that a contract has been deployed.
+
+The browser app offers Bradbury, Asimov, and Studionet. Verify current network details in the official [GenLayer network documentation](https://docs.genlayer.com/developers/networks). Writes can require test GEN and may take time to finalize; reads do not submit a transaction.
+
 This repository includes the GenLayer Codex skills for contract authoring, linting, and CLI deployment under .agents/skills. They were installed from the official [GenLayer skills repository](https://github.com/genlayerlabs/skills).
 
 ## Deploy on a GenLayer test network

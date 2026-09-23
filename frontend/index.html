@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f7f8f4" />
+    <meta name="description" content="A cautious, evidence-first claim review powered by GenLayer validator consensus." />
+    <title>ClaimLens — evidence, checked together</title>
+  </head>
+  <body>
+    <div id="app">
+      <header class="topbar">
+        <a class="brand" href="#top" aria-label="ClaimLens home">
+          <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+          <span>Claim<span class="brand-light">Lens</span></span>
+        </a>
+        <nav class="top-links" aria-label="Main navigation">
+          <a href="#how-it-works">How it works</a>
+          <a href="https://github.com/ThunkyBin/genlayer-claimlens" target="_blank" rel="noreferrer">Source <span aria-hidden="true">↗</span></a>
+        </nav>
+        <div class="network-control">
+          <span class="network-dot" aria-hidden="true"></span>
+          <label for="network">Network</label>
+          <select id="network" aria-label="GenLayer network">
+            <option value="bradbury">Bradbury testnet</option>
+            <option value="asimov">Asimov testnet</option>
+            <option value="studionet">Studionet</option>
+          </select>
+        </div>
+      </header>
+
+      <main id="top">
+        <section class="hero">
+          <div class="hero-copy">
+            <div class="eyebrow"><span></span> A GenLayer consensus demo</div>
+            <h1>Evidence first.<br /><em>Verdicts together.</em></h1>
+            <p class="hero-intro">ClaimLens checks a public claim against independent web sources. GenLayer validators repeat the review and agree on the verdict before it is recorded.</p>
+            <div class="hero-proof">
+              <span class="proof-icon" aria-hidden="true">↗</span>
+              <span><strong>One claim</strong> · <strong>2–3 sources</strong> · <strong>validator consensus</strong></span>
+            </div>
+          </div>
+          <aside class="hero-note" aria-label="Prototype scope">
+            <div class="note-index">01 / A careful starting point</div>
+            <p>Models can be wrong. ClaimLens shows a consensus result and its evidence trail; it does not certify truth.</p>
+            <a href="#limits">Read the limits <span aria-hidden="true">↓</span></a>
+          </aside>
+        </section>
+
+        <section class="workspace" aria-labelledby="review-title">
+          <div class="workspace-head">
+            <div>
+              <div class="section-kicker">THE REVIEW DESK</div>
+              <h2 id="review-title">Check a claim</h2>
+            </div>
+            <div class="wallet-area">
+              <div id="wallet-status" class="wallet-status" aria-live="polite">Wallet not connected</div>
+              <button id="connect-wallet" class="button button-dark" type="button">Connect wallet <span aria-hidden="true">↗</span></button>
+            </div>
+          </div>
+
+          <div class="desk-grid">
+            <form id="review-form" class="review-form">
+              <label class="field-label" for="claim">The claim to check <span id="claim-count">0 / 280</span></label>
+              <textarea id="claim" maxlength="280" rows="4" placeholder="Example: GenLayer’s Bradbury testnet has chain ID 4221." required></textarea>
+              <div class="field-heading">
+                <label class="field-label" for="source-1">Public source URLs</label>
+                <span class="field-hint">Use independent, public HTTPS pages</span>
+              </div>
+              <input id="source-1" class="source-input" type="url" inputmode="url" placeholder="https://docs.example.org/page" required />
+              <input id="source-2" class="source-input" type="url" inputmode="url" placeholder="https://another-source.example.org/page" required />
+              <div id="source-3-wrap" class="source-input optional-source" hidden>
+                <input id="source-3" type="url" inputmode="url" placeholder="https://third-source.example.org/page (optional)" />
+                <button id="remove-source" class="icon-button" type="button" aria-label="Remove third source">×</button>
+              </div>
+              <button id="add-source" class="add-source" type="button"><span aria-hidden="true">＋</span> Add a third source</button>
+
+              <div class="form-divider"></div>
+              <label class="field-label" for="contract-address">ClaimLens contract address <span class="field-hint">required to read or submit</span></label>
+              <input id="contract-address" class="address-input" type="text" spellcheck="false" autocomplete="off" placeholder="0x…" />
+              <div class="form-actions">
+                <button id="submit-review" class="button button-green" type="submit" disabled>Review and submit <span aria-hidden="true">↗</span></button>
+              </div>
+              <p class="fee-note">A review is an on-chain write and may require test GEN. Your wallet shows the network fee before approval; nothing is sent until you approve there.</p>
+            </form>
+
+            <aside class="result-panel" aria-labelledby="result-title">
+              <div class="result-topline"><span class="result-live-dot"></span> VALIDATOR CONSENSUS</div>
+              <div class="result-empty" id="result-empty">
+                <div class="lens-illustration" aria-hidden="true"><span></span><i></i></div>
+                <h3 id="result-title">Your result will land here.</h3>
+                <p>Enter a deployed contract address to load the latest assessment. A wallet is needed only to submit a new review.</p>
+              </div>
+              <div class="result-content" id="result-content" hidden>
+                <div class="verdict-row"><span id="verdict" class="verdict-pill">—</span><span id="assessment-id" class="assessment-id"></span></div>
+                <p id="result-claim" class="result-claim"></p>
+                <div class="result-meta"><span id="sources-used">0 sources</span><span>Validator agreement on verdict</span></div>
+                <p id="rationale" class="rationale"></p>
+                <div id="result-sources" class="result-sources"></div>
+              </div>
+              <div class="result-footer">
+                <div><span class="footer-label">ASSESSMENTS STORED</span><strong id="assessment-count">—</strong></div>
+                <button id="load-latest" class="text-button" type="button" disabled>Load latest <span aria-hidden="true">↗</span></button>
+              </div>
+              <div id="activity" class="activity" aria-live="polite"></div>
+            </aside>
+          </div>
+        </section>
+
+        <section id="how-it-works" class="how-section">
+          <div class="section-kicker">FROM SOURCE TO STATE</div>
+          <h2>A small, inspectable workflow.</h2>
+          <div class="steps-grid">
+            <article class="step-card"><span class="step-number">01</span><h3>Bring evidence</h3><p>Submit one public claim and two or three distinct HTTPS source URLs.</p></article>
+            <article class="step-card"><span class="step-number">02</span><h3>Review independently</h3><p>The contract fetches bounded excerpts; the leader and validators assess the same evidence.</p></article>
+            <article class="step-card"><span class="step-number">03</span><h3>Record agreement</h3><p>The contract stores one of four verdicts only when validators agree on the verdict.</p></article>
+          </div>
+        </section>
+
+        <section class="setup-strip" aria-label="Contract setup">
+          <div><div class="section-kicker">NO CONTRACT ADDRESS YET?</div><h2>Deploy the prototype in GenLayer Studio.</h2><p>Load the contract source, deploy it on the selected test network, then paste the address above.</p></div>
+          <div class="setup-actions"><a class="button button-dark" href="https://studio.genlayer.com" target="_blank" rel="noreferrer">Open GenLayer Studio <span aria-hidden="true">↗</span></a><a class="source-link" href="https://github.com/ThunkyBin/genlayer-claimlens/blob/main/contracts/claim_lens.py" target="_blank" rel="noreferrer">View contract source ↗</a></div>
+        </section>
+
+        <section id="limits" class="limits-section">
+          <div class="limits-mark" aria-hidden="true">!</div>
+          <div><div class="section-kicker">READ THIS BEFORE RELYING ON A VERDICT</div><h2>Consensus is not proof.</h2><p>This is a testnet research prototype. Source pages may be incomplete, misleading, stale, or adversarial. Validators agreeing means they produced the same label under this contract’s rules; it does not establish truth. Do not use it for medical, legal, financial, employment, or other high-impact decisions. Each review can use testnet resources and may be slow.</p></div>
+        </section>
+      </main>
+
+      <footer class="footer"><a class="brand" href="#top"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span><span>Claim<span class="brand-light">Lens</span></span></a><span>Built for the GenLayer test networks · Research prototype</span><a href="https://github.com/ThunkyBin/genlayer-claimlens" target="_blank" rel="noreferrer">Open source ↗</a></footer>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
