@@ -56,7 +56,7 @@ The static app is in `frontend/`. It supports read-only assessment lookup and le
     npm ci
     npm run dev
 
-To publish without a GitHub Actions runner, build with `npm run build` from `frontend/`. Vite writes the static site to `docs/`; publish the `main` branch's `/docs` directory with GitHub Pages. The checked-in `docs/` output is the published site artifact. The app requires a ClaimLens contract deployed separately on the selected network; the Studionet test deployment is recorded below.
+To publish without a GitHub Actions runner, build with `npm run build` from `frontend/`. Vite writes the GitHub Pages site to `docs/`; publish the `main` branch's `/docs` directory. For a Vercel root deployment, run `npm run build:vercel` from `frontend/` and deploy its `dist/` output. The app requires a ClaimLens contract deployed separately on the selected network; the Studionet test deployment is recorded below.
 
 The browser app offers Bradbury, Asimov, and Studionet. Verify current network details in the official [GenLayer network documentation](https://docs.genlayer.com/developers/networks). Writes can require test GEN and may take time to finalize; reads do not submit a transaction.
 

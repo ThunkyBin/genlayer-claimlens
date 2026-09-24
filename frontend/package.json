@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1",
-    "build": "vite build"
+    "build": "vite build",
+    "build:vercel": "vite build --base / --outDir dist"
   },
   "dependencies": {
     "genlayer-js": "1.1.8"

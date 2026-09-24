@@ -8,6 +8,7 @@ const networkTable = {
   asimov: { label: 'Asimov testnet', chain: testnetAsimov, sdkName: 'testnetAsimov', explorer: 'https://explorer-asimov.genlayer.com' },
   studionet: { label: 'Studionet', chain: studionet, sdkName: 'studionet', explorer: 'https://explorer-studio.genlayer.com' },
 };
+const READ_ONLY_CALLER = '0x0000000000000000000000000000000000000000';
 
 const el = (selector) => document.querySelector(selector);
 const networkSelect = el('#network');
@@ -65,7 +66,10 @@ function updateFormState() {
 }
 
 function getReadClient() {
-  return createClient({ chain: networkTable[activeNetworkKey].chain });
+  return createClient({
+    chain: networkTable[activeNetworkKey].chain,
+    account: activeAccount || READ_ONLY_CALLER,
+  });
 }
 
 async function connectWallet() {
