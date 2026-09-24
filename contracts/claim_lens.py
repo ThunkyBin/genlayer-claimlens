@@ -51,25 +51,35 @@ class ClaimLens(gl.Contract):
 
         def assess_sources() -> typing.Any:
             evidence = []
+            usable_excerpts = []
             usable_source_count = 0
             for url in sources_for_review:
-                response = gl.nondet.web.get(url)
-                status_code = response.status
+                try:
+                    response = gl.nondet.web.get(url)
+                    status_code = response.status
+                except Exception:
+                    response = None
+                    status_code = 0
                 excerpt = ""
-                if status_code >= 200 and status_code < 300:
+                is_unique_excerpt = False
+                if response is not None and status_code >= 200 and status_code < 300:
                     try:
                         body = response.body
                         if body is not None:
                             excerpt = body.decode("utf-8")[:_MAX_EXCERPT_LENGTH]
                             if excerpt.strip():
-                                usable_source_count += 1
+                                excerpt_key = " ".join(excerpt.lower().split())
+                                is_unique_excerpt = excerpt_key not in usable_excerpts
+                                if is_unique_excerpt:
+                                    usable_source_count += 1
+                                    usable_excerpts.append(excerpt_key)
                     except Exception:
                         excerpt = ""
                 evidence.append(
                     {
                         "url": url,
                         "http_status": status_code,
-                        "excerpt": excerpt,
+                        "excerpt": excerpt if is_unique_excerpt else "",
                     }
                 )
 
@@ -100,7 +110,14 @@ sources conflict without a clear resolution, or the evidence does not directly
 address the claim. Do not infer facts that are absent from the excerpts.
 This is research triage, not professional advice.
 """
-            raw_result = gl.nondet.exec_prompt(prompt, response_format="json")
+            try:
+                raw_result = gl.nondet.exec_prompt(prompt, response_format="json")
+            except Exception:
+                return {
+                    "verdict": "INSUFFICIENT",
+                    "rationale": "The source review could not be completed.",
+                    "sources_used": usable_source_count,
+                }
             if not isinstance(raw_result, dict):
                 return {
                     "verdict": "INSUFFICIENT",
@@ -160,7 +177,7 @@ This is research triage, not professional advice.
             "verdict": verdict,
             "rationale": rationale,
             "sources_used": sources_used,
-            "consensus_rule": "validators_agree_on_verdict_and_source_count",
+            "consensus_rule": "validators_agree_on_verdict_and_unique_source_count",
         }
 
         assessment_id = self.next_assessment_id
