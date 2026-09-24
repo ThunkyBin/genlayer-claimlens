@@ -16,10 +16,10 @@ ClaimLens is deliberately non-custodial: it has no token balances, payments, or 
 1. A caller submits a claim and two or three HTTPS source URLs.
 2. The contract fetches bounded text excerpts from those sources.
 3. The leader and validators independently assess the same evidence.
-4. GenLayer consensus accepts the result only when validators agree on the verdict.
+4. GenLayer consensus accepts the result only when validators agree on the verdict and unique usable source count.
 5. The contract stores the verdict and the leader’s short rationale under an assessment ID.
 
-Validator consensus covers the verdict and the number of usable source excerpts. The leader's explanatory rationale is stored for context and is not independently compared; treat it as an unverified model summary.
+Validator consensus covers the verdict and the number of unique usable source excerpts. The leader's explanatory rationale is stored for context and is not independently compared; treat it as an unverified model summary.
 
 ## Use responsibly
 
@@ -78,8 +78,8 @@ Check current RPC, chain ID, and faucet information in the official [GenLayer ne
 - Contract: `0x56Be71883DC0154c28a471c1B82481ABfEB21D5F` ([Explorer](https://explorer-studio.genlayer.com/address/0x56Be71883DC0154c28a471c1B82481ABfEB21D5F)).
 - Deployment transaction: `0x0711c89d30641b0a6e9781c5c2cb3b81254dcbbde1112941f84bd65fab43d757` ([Explorer](https://explorer-studio.genlayer.com/tx/0x0711c89d30641b0a6e9781c5c2cb3b81254dcbbde1112941f84bd65fab43d757)).
 - Successful assessment: ID `1`, verdict `SUPPORTED`; transaction `0xd0995c2bc651ec399476357cc24b6dfbee2d49b264f3195838afe7bfacc0d26c` ([Explorer](https://explorer-studio.genlayer.com/tx/0xd0995c2bc651ec399476357cc24b6dfbee2d49b264f3195838afe7bfacc0d26c)).
-- On-chain `get_assessment_count()` returned `2`; the earlier ID `0` result is `INSUFFICIENT` because the rendered documentation shell omitted the relevant text. The successful test used the official raw Markdown sources listed in the stored record.
-- Deployment and both test writes were made from the hosted Studio account, which remained at `0 GEN`; no user wallet was connected or funded.
+- On-chain `get_assessment_count()` returned `3` after a further full-consensus write. Assessment ID `2` finalized with verdict `SUPPORTED`, citing two official GenLayer documentation sources; transaction `0x3377bdcc19f70159fa02e96b956636078be5f6ebcc98951d8c2e32576a12fa9a` ([Explorer](https://explorer-studio.genlayer.com/tx/0x3377bdcc19f70159fa02e96b956636078be5f6ebcc98951d8c2e32576a12fa9a)). The earlier ID `0` result is `INSUFFICIENT` because the rendered documentation shell omitted the relevant text.
+- The writes used the hosted Studio account. Its built-in faucet credited `10` test GEN before the ID `2` write. This account is separate from the user's OKX wallet; no OKX wallet was connected or funded.
 
 ## Example input
 
