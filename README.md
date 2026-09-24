@@ -27,7 +27,7 @@ This is an experimental research aid, not a truth oracle. Web pages can be incom
 
 Use only public, non-sensitive claims and sources. Do not use this prototype for medical, legal, financial, employment, or other high-impact decisions. Each assessment performs multiple web requests and LLM calls, so it can be slow and consume testnet GEN.
 
-The contract applies basic URL checks: HTTPS only, no URL credentials, localhost, local suffixes, or IP-literal hosts. This is not a full SSRF defense. Deploy only to a test network and review the source before use.
+The contract applies strict basic URL checks: HTTPS only, ASCII DNS names, no URL credentials, non-default ports, local suffixes, or IP-literal hosts (including common hexadecimal and numeric forms). This contract cannot verify DNS resolution, rebinding, or redirect destinations enforced by the GenLayer fetch service. Use only public, non-sensitive sources; do not treat this prototype as production-ready until the network's outbound-fetch and redirect safeguards have been independently verified.
 
 ## Contract interface
 
@@ -46,7 +46,7 @@ Requirements: Python 3.12 or newer.
     python -m pip install -r requirements-dev.txt
     .\scripts\check.ps1
 
-The local check script runs the GenVM safety/SDK validation and type checker used by the GitHub Actions workflow. It can be used when GitHub does not start hosted jobs.
+The local check script runs GenVM safety/SDK validation, type checking, and fast mocked direct-mode contract tests. It can be used when GitHub does not start hosted jobs.
 
 ## Web interface
 
@@ -56,7 +56,7 @@ The static app is in `frontend/`. It supports read-only assessment lookup and le
     npm ci
     npm run dev
 
-To publish without a GitHub Actions runner, build with `npm run build` from `frontend/`. Vite writes the static site to `docs/`; publish the `main` branch's `/docs` directory with GitHub Pages. The checked-in `docs/` output is the published site artifact. The app requires a ClaimLens contract deployed separately on the selected network; this repository does not claim that a contract has been deployed.
+To publish without a GitHub Actions runner, build with `npm run build` from `frontend/`. Vite writes the static site to `docs/`; publish the `main` branch's `/docs` directory with GitHub Pages. The checked-in `docs/` output is the published site artifact. The app requires a ClaimLens contract deployed separately on the selected network; the Studionet test deployment is recorded below.
 
 The browser app offers Bradbury, Asimov, and Studionet. Verify current network details in the official [GenLayer network documentation](https://docs.genlayer.com/developers/networks). Writes can require test GEN and may take time to finalize; reads do not submit a transaction.
 
@@ -71,6 +71,15 @@ This repository includes the GenLayer Codex skills for contract authoring, linti
 5. Read the returned assessment ID with get_assessment.
 
 Check current RPC, chain ID, and faucet information in the official [GenLayer network documentation](https://docs.genlayer.com/developers/networks). Bradbury is the recommended production-like test network; Asimov is for infrastructure testing. Both currently list chain ID 4221.
+
+### Verified Studionet deployment
+
+- Network: hosted Studionet, chain ID 61999 (temporary development network; not the persistent Bradbury testnet).
+- Contract: `0x56Be71883DC0154c28a471c1B82481ABfEB21D5F` ([Explorer](https://explorer-studio.genlayer.com/address/0x56Be71883DC0154c28a471c1B82481ABfEB21D5F)).
+- Deployment transaction: `0x0711c89d30641b0a6e9781c5c2cb3b81254dcbbde1112941f84bd65fab43d757` ([Explorer](https://explorer-studio.genlayer.com/tx/0x0711c89d30641b0a6e9781c5c2cb3b81254dcbbde1112941f84bd65fab43d757)).
+- Successful assessment: ID `1`, verdict `SUPPORTED`; transaction `0xd0995c2bc651ec399476357cc24b6dfbee2d49b264f3195838afe7bfacc0d26c` ([Explorer](https://explorer-studio.genlayer.com/tx/0xd0995c2bc651ec399476357cc24b6dfbee2d49b264f3195838afe7bfacc0d26c)).
+- On-chain `get_assessment_count()` returned `2`; the earlier ID `0` result is `INSUFFICIENT` because the rendered documentation shell omitted the relevant text. The successful test used the official raw Markdown sources listed in the stored record.
+- Deployment and both test writes were made from the hosted Studio account, which remained at `0 GEN`; no user wallet was connected or funded.
 
 ## Example input
 

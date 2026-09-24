@@ -53,7 +53,7 @@ class ClaimLens(gl.Contract):
             usable_source_count = 0
             for url in sources_for_review:
                 response = gl.nondet.web.get(url)
-                status_code = response.status_code
+                status_code = response.status
                 excerpt = ""
                 if status_code >= 200 and status_code < 300:
                     try:
@@ -178,8 +178,27 @@ def _is_public_https_url(url: str) -> bool:
 
     if not authority or "@" in authority or ":" in authority:
         return False
-    if "." not in authority:
+    if len(authority) > 253 or not authority.isascii():
         return False
+
+    labels = authority.split(".")
+    if len(labels) < 2:
+        return False
+    for label in labels:
+        if not label or len(label) > 63 or label[0] == "-" or label[-1] == "-":
+            return False
+        for character in label:
+            if character not in "abcdefghijklmnopqrstuvwxyz0123456789-":
+                return False
+        if label.startswith("0x") and len(label) > 2:
+            hex_digits_only = True
+            for character in label[2:]:
+                if character not in "0123456789abcdef":
+                    hex_digits_only = False
+                    break
+            if hex_digits_only:
+                return False
+
     if authority == "localhost" or authority.endswith(".localhost"):
         return False
     if authority.endswith(".local") or authority.endswith(".internal"):

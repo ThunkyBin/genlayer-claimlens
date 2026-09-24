@@ -24,7 +24,7 @@
           <select id="network" aria-label="GenLayer network">
             <option value="bradbury">Bradbury testnet</option>
             <option value="asimov">Asimov testnet</option>
-            <option value="studionet">Studionet</option>
+            <option value="studionet" selected>Studionet</option>
           </select>
         </div>
       </header>
@@ -76,8 +76,8 @@
               <button id="add-source" class="add-source" type="button"><span aria-hidden="true">＋</span> Add a third source</button>
 
               <div class="form-divider"></div>
-              <label class="field-label" for="contract-address">ClaimLens contract address <span class="field-hint">required to read or submit</span></label>
-              <input id="contract-address" class="address-input" type="text" spellcheck="false" autocomplete="off" placeholder="0x…" />
+              <label class="field-label" for="contract-address">ClaimLens contract address <span class="field-hint">preloaded Studionet demo · temporary state</span></label>
+              <input id="contract-address" class="address-input" type="text" spellcheck="false" autocomplete="off" value="0x56Be71883DC0154c28a471c1B82481ABfEB21D5F" placeholder="0x…" />
               <div class="form-actions">
                 <button id="submit-review" class="button button-green" type="submit" disabled>Review and submit <span aria-hidden="true">↗</span></button>
               </div>
@@ -95,6 +95,7 @@
                 <div class="verdict-row"><span id="verdict" class="verdict-pill">—</span><span id="assessment-id" class="assessment-id"></span></div>
                 <p id="result-claim" class="result-claim"></p>
                 <div class="result-meta"><span id="sources-used">0 sources</span><span>Validator agreement on verdict</span></div>
+                <span class="footer-label">LEADER MODEL EXPLANATION · NOT IN VALIDATOR CONSENSUS</span>
                 <p id="rationale" class="rationale"></p>
                 <div id="result-sources" class="result-sources"></div>
               </div>

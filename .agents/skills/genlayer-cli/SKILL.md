@@ -31,7 +31,7 @@ genlayer network list                   # List all networks
 
 Networks: `localnet`, `studionet`, `testnet-asimov`, `testnet-bradbury`
 
-**Note**: `studionet` is gasless — no tokens are required to deploy or interact with contracts. A 0 GEN balance is expected and does not prevent any operations.
+**Fees**: Do not assume a Studio network is gasless from its name or a zero balance. Estimate the transaction using the active network's fee API/profile first. Some Studio deployments run gasless; others and public testnets may charge GEN. Stop before signing if the fee quote exceeds the user's stated spending limit.
 
 **Note**: `studionet` is rate-limited per IP — **60 req/min, 1000 req/hr, 10000 req/day**. Limits aren't permanent — batching many `deploy`/`write` calls trips `-32429` / HTTP 429 and further requests are rejected until the window resets (next minute / hour / day cycle). `-32028` signals the pending-queue cap — **up to 32 in-flight txs per sender**; a separate cap also applies per contract. Throttle batch scripts, wait for receipts between submissions, or use `localnet` for heavy batches.
 
@@ -76,7 +76,7 @@ echo "mypassword" | genlayer deploy --contract contracts/my_contract.py --args "
 
 New accounts start with 0 GEN. Funding requirements depend on the network:
 
-**StudioNet is gasless** — accounts with 0 GEN can deploy and interact with contracts without any funding. A zero balance on StudioNet is expected and normal. Skip funding entirely when using StudioNet.
+Some Studio deployments are gasless, while others charge fees. Inspect the live estimate and fee policy before deployment; never infer zero cost from `studionet` or a zero balance alone. If the estimate is nonzero, use only explicitly authorized funds or stop.
 
 For **testnets** (Bradbury, Asimov), fund the account before deploying or writing.
 

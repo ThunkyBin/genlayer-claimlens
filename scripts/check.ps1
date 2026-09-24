@@ -14,7 +14,13 @@ try {
     & $linter check "contracts\claim_lens.py"
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
+    & (Join-Path $venvScripts "python.exe") "scripts\sync_genvm_test_cache.py"
+    if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
     & $linter typecheck "contracts\claim_lens.py"
+    if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+    & (Join-Path $venvScripts "python.exe") -m pytest "tests\direct" -v
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
     Write-Host "Local GenLayer checks passed."
