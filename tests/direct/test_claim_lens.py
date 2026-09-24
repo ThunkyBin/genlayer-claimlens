@@ -34,6 +34,11 @@ def test_assess_rejects_empty_or_oversized_claim(direct_vm, direct_deploy, claim
             "Provide two or three distinct source URLs.",
         ),
         ("https://one.example/a\nhttps://one.example/a", "Source URLs must be distinct."),
+        (
+            "https://one.example/a#first-section\nhttps://one.example/a#second-section",
+            "Source URLs must be distinct.",
+        ),
+        ("https://ONE.example/a\nhttps://one.example/a", "Source URLs must be distinct."),
     ],
 )
 def test_assess_rejects_wrong_source_count_or_duplicates(direct_vm, direct_deploy, sources, expected):
@@ -90,7 +95,7 @@ def test_assess_stores_agreed_verdict_and_leader_rationale(direct_vm, direct_dep
     assert record["verdict"] == "SUPPORTED"
     assert record["rationale"] == "Both sources contain matching evidence."
     assert record["sources_used"] == 2
-    assert record["consensus_rule"] == "validators_agree_on_verdict"
+    assert record["consensus_rule"] == "validators_agree_on_verdict_and_source_count"
 
 
 def test_assess_returns_insufficient_when_two_sources_are_not_usable(direct_vm, direct_deploy):

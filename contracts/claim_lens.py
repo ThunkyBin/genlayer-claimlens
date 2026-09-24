@@ -39,6 +39,7 @@ class ClaimLens(gl.Contract):
             if len(url) > _MAX_URL_LENGTH:
                 raise gl.vm.UserError("Each source URL must be 2,048 characters or fewer.")
 
+        source_urls = [_canonical_source_url(url) for url in source_urls]
         for index in range(len(source_urls)):
             for other_index in range(index + 1, len(source_urls)):
                 if source_urls[index] == source_urls[other_index]:
@@ -132,9 +133,16 @@ This is research triage, not professional advice.
             leader_verdict = leader_assessment.get("verdict", "")
             if leader_verdict not in ("SUPPORTED", "REFUTED", "MIXED", "INSUFFICIENT"):
                 return False
+            leader_sources_used = leader_assessment.get("sources_used")
+            if not isinstance(leader_sources_used, int) or not 0 <= leader_sources_used <= len(sources_for_review):
+                return False
 
             validator_assessment = assess_sources()
-            return validator_assessment.get("verdict", "") == leader_verdict
+            return (
+                isinstance(validator_assessment, dict)
+                and validator_assessment.get("verdict", "") == leader_verdict
+                and validator_assessment.get("sources_used") == leader_sources_used
+            )
 
         assessment = gl.vm.run_nondet_unsafe(assess_sources, validators_agree)
         if not isinstance(assessment, dict):
@@ -152,7 +160,7 @@ This is research triage, not professional advice.
             "verdict": verdict,
             "rationale": rationale,
             "sources_used": sources_used,
-            "consensus_rule": "validators_agree_on_verdict",
+            "consensus_rule": "validators_agree_on_verdict_and_source_count",
         }
 
         assessment_id = self.next_assessment_id
@@ -213,3 +221,17 @@ def _is_public_https_url(url: str) -> bool:
         return False
 
     return True
+
+
+def _canonical_source_url(url: str) -> str:
+    """Remove fragments and normalize the case-insensitive host before fetching."""
+    url_without_fragment = url.split("#", 1)[0]
+    authority_start = len("https://")
+    authority_end = len(url_without_fragment)
+    for delimiter in ("/", "?"):
+        delimiter_index = url_without_fragment.find(delimiter, authority_start)
+        if delimiter_index >= 0 and delimiter_index < authority_end:
+            authority_end = delimiter_index
+
+    authority = url_without_fragment[authority_start:authority_end].lower()
+    return "https://" + authority + url_without_fragment[authority_end:]

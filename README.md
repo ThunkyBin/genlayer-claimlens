@@ -19,7 +19,7 @@ ClaimLens is deliberately non-custodial: it has no token balances, payments, or 
 4. GenLayer consensus accepts the result only when validators agree on the verdict.
 5. The contract stores the verdict and the leader’s short rationale under an assessment ID.
 
-The validator consensus covers the verdict. The explanatory rationale is stored for context and may differ between model runs.
+Validator consensus covers the verdict and the number of usable source excerpts. The leader's explanatory rationale is stored for context and is not independently compared; treat it as an unverified model summary.
 
 ## Use responsibly
 
