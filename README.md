@@ -27,7 +27,7 @@ This is an experimental research aid, not a truth oracle. Web pages can be incom
 
 Use only public, non-sensitive claims and sources. Do not use this prototype for medical, legal, financial, employment, or other high-impact decisions. Each assessment performs multiple web requests and LLM calls, so it can be slow and consume testnet GEN.
 
-The contract applies strict basic URL checks: HTTPS only, ASCII DNS names, no URL credentials, non-default ports, local suffixes, or IP-literal hosts (including common hexadecimal and numeric forms). This contract cannot verify DNS resolution, rebinding, or redirect destinations enforced by the GenLayer fetch service. Use only public, non-sensitive sources; do not treat this prototype as production-ready until the network's outbound-fetch and redirect safeguards have been independently verified.
+The contract applies strict basic URL checks: HTTPS only, ASCII DNS names, no URL credentials or explicit ports, local suffixes, or IP-literal hosts (including common hexadecimal and numeric forms). This contract cannot verify DNS resolution, rebinding, or redirect destinations enforced by the GenLayer fetch service. Use only public, non-sensitive sources; do not treat this prototype as production-ready until the network's outbound-fetch and redirect safeguards have been independently verified.
 
 ## Contract interface
 
@@ -47,6 +47,18 @@ Requirements: Python 3.12 or newer.
     .\scripts\check.ps1
 
 The local check script runs GenVM safety/SDK validation, type checking, and fast mocked direct-mode contract tests. It can be used when GitHub does not start hosted jobs.
+
+## Contributor resources
+
+- [First assessment walkthrough](guides/first-assessment.md): read a stored example, submit a public claim, and interpret the result safely.
+- [Consensus-boundary research note](research/consensus-boundary-evaluation.md): a controlled evaluation of exactly what validator agreement checks, with a focused direct-mode test.
+- [Local preflight tool](scripts/preflight_assessment.py): validate a claim and source URLs and print the contract call arguments before using GenLayer Studio or the app.
+
+Run the preflight tool with two or three sources. It does not fetch pages, connect a wallet, or submit a transaction; its URL checks mirror the contract's syntax rules, which remain authoritative.
+
+    python scripts/preflight_assessment.py --claim "A public claim to review" --source https://one.example/page --source https://two.example/page
+
+Alternatively, pass a UTF-8 file with one source URL per line using `--source-file sources.txt`.
 
 ## Web interface
 

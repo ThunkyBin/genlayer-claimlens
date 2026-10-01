@@ -86,10 +86,18 @@
 
             <aside class="result-panel" aria-labelledby="result-title">
               <div class="result-topline"><span class="result-live-dot"></span> VALIDATOR CONSENSUS</div>
+              <form id="assessment-lookup-form" class="assessment-lookup-form" novalidate>
+                <label class="field-label" for="assessment-lookup-id">Find a finalized assessment</label>
+                <div class="assessment-lookup-row">
+                  <input id="assessment-lookup-id" type="text" inputmode="numeric" maxlength="78" autocomplete="off" spellcheck="false" placeholder="Assessment ID, e.g. 2" aria-describedby="assessment-lookup-hint" />
+                  <button id="lookup-assessment" class="text-button" type="submit">Load ID <span aria-hidden="true">↗</span></button>
+                </div>
+                <p id="assessment-lookup-hint" class="assessment-lookup-hint">Read-only lookup · no wallet required</p>
+              </form>
               <div class="result-empty" id="result-empty">
                 <div class="lens-illustration" aria-hidden="true"><span></span><i></i></div>
                 <h3 id="result-title">Your result will land here.</h3>
-                <p>Enter a deployed contract address to load the latest assessment. A wallet is needed only to submit a new review.</p>
+                <p>Load the latest assessment or look up a stored assessment ID. A wallet is needed only to submit a new review.</p>
               </div>
               <div class="result-content" id="result-content" hidden>
                 <div class="verdict-row"><span id="verdict" class="verdict-pill">—</span><span id="assessment-id" class="assessment-id"></span></div>
@@ -101,7 +109,10 @@
               </div>
               <div class="result-footer">
                 <div><span class="footer-label">ASSESSMENTS STORED</span><strong id="assessment-count">—</strong></div>
-                <button id="load-latest" class="text-button" type="button" disabled>Load latest <span aria-hidden="true">↗</span></button>
+                <div class="result-actions">
+                  <button id="copy-assessment-link" class="text-button" type="button" hidden>Copy link</button>
+                  <button id="load-latest" class="text-button" type="button" disabled>Load latest <span aria-hidden="true">↗</span></button>
+                </div>
               </div>
               <div id="activity" class="activity" aria-live="polite"></div>
             </aside>
