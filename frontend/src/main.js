@@ -20,12 +20,20 @@ const activity = el('#activity');
 const resultEmpty = el('#result-empty');
 const resultContent = el('#result-content');
 const loadLatestButton = el('#load-latest');
+const assessmentHistory = el('#assessment-history');
+const assessmentPosition = el('#assessment-position');
+const assessmentIdInput = el('#assessment-id-input');
+const previousAssessmentButton = el('#previous-assessment');
+const loadAssessmentButton = el('#load-assessment');
+const nextAssessmentButton = el('#next-assessment');
 const claimInput = el('#claim');
 const source3Wrap = el('#source-3-wrap');
 
 let activeAccount = '';
 let activeClient;
 let activeNetworkKey = networkSelect.value;
+let storedAssessmentCount = null;
+let activeAssessmentId = null;
 
 const persistedAddress = localStorage.getItem('claimlens.contractAddress');
 const persistedNetwork = localStorage.getItem('claimlens.network');
@@ -104,14 +112,23 @@ async function connectWallet() {
 
 async function refreshContractSummary() {
   const address = getContractAddress();
+  storedAssessmentCount = null;
+  activeAssessmentId = null;
+  updateAssessmentHistory();
   if (!address) {
     el('#assessment-count').textContent = '—';
     loadLatestButton.disabled = true;
+    storedAssessmentCount = null;
+    activeAssessmentId = null;
+    resultContent.hidden = true;
+    resultEmpty.hidden = false;
+    updateAssessmentHistory();
     return;
   }
   try {
     const count = await getReadClient().readContract({ address, functionName: 'get_assessment_count', args: [] });
     const parsedCount = BigInt(String(count));
+    storedAssessmentCount = parsedCount;
     el('#assessment-count').textContent = parsedCount.toString();
     loadLatestButton.disabled = parsedCount === 0n;
     if (parsedCount > 0n) {
@@ -119,15 +136,20 @@ async function refreshContractSummary() {
       resultContent.hidden = false;
       await loadAssessment(parsedCount - 1n);
     } else {
+      activeAssessmentId = null;
       resultContent.hidden = true;
       resultEmpty.hidden = false;
+      updateAssessmentHistory();
       setActivity('Connected to ClaimLens. No assessments have been stored yet.');
     }
   } catch (error) {
+    storedAssessmentCount = null;
+    activeAssessmentId = null;
     el('#assessment-count').textContent = '—';
     loadLatestButton.disabled = true;
     resultContent.hidden = true;
     resultEmpty.hidden = false;
+    updateAssessmentHistory();
     setActivity(error instanceof Error ? `Could not read this contract: ${error.message}` : 'Could not read this contract.', true);
   }
 }
@@ -135,12 +157,16 @@ async function refreshContractSummary() {
 async function loadAssessment(id) {
   const address = getContractAddress();
   if (!address) return;
-  setActivity(`Reading assessment ${id.toString()} from ${networkTable[activeNetworkKey].label}…`);
   try {
-    const raw = await getReadClient().readContract({ address, functionName: 'get_assessment', args: [id] });
+    const assessmentId = BigInt(String(id));
+    if (storedAssessmentCount === null || assessmentId < 0n || assessmentId >= storedAssessmentCount) {
+      throw new Error('Choose an assessment ID between 0 and the latest stored ID.');
+    }
+    setActivity(`Reading assessment ${assessmentId.toString()} from ${networkTable[activeNetworkKey].label}…`);
+    const raw = await getReadClient().readContract({ address, functionName: 'get_assessment', args: [assessmentId] });
     const record = typeof raw === 'string' ? JSON.parse(raw) : raw;
     if (!record || typeof record !== 'object' || !record.verdict) throw new Error('No completed assessment was returned.');
-    showAssessment(record, id);
+    showAssessment(record, assessmentId);
     setActivity('Assessment loaded from the contract.');
   } catch (error) {
     setActivity(error instanceof Error ? error.message : 'Could not load the assessment.', true);
@@ -158,6 +184,9 @@ function showAssessment(record, id) {
   el('#result-claim').textContent = record.claim || 'Claim text unavailable.';
   el('#rationale').textContent = record.rationale || 'No rationale was stored.';
   el('#sources-used').textContent = `${record.sources_used ?? record.sources?.length ?? 0} sources reviewed`;
+  activeAssessmentId = BigInt(String(id));
+  assessmentIdInput.value = activeAssessmentId.toString();
+  updateAssessmentHistory();
   const sources = el('#result-sources');
   sources.replaceChildren();
   for (const url of (Array.isArray(record.sources) ? record.sources : [])) {
@@ -176,6 +205,28 @@ function showAssessment(record, id) {
     link.textContent = url;
     sources.append(link);
   }
+}
+
+function updateAssessmentHistory() {
+  const hasHistory = storedAssessmentCount !== null && storedAssessmentCount > 1n;
+  assessmentHistory.hidden = !hasHistory;
+  if (!hasHistory) {
+    assessmentPosition.textContent = '';
+    previousAssessmentButton.disabled = true;
+    loadAssessmentButton.disabled = true;
+    nextAssessmentButton.disabled = true;
+    return;
+  }
+
+  assessmentPosition.textContent = activeAssessmentId === null
+    ? `${storedAssessmentCount.toString()} stored`
+    : `Assessment ${(activeAssessmentId + 1n).toString()} of ${storedAssessmentCount.toString()} · ID ${activeAssessmentId.toString()}`;
+  previousAssessmentButton.disabled = activeAssessmentId === null || activeAssessmentId === 0n;
+  nextAssessmentButton.disabled = activeAssessmentId === null || activeAssessmentId >= storedAssessmentCount - 1n;
+  const requestedId = assessmentIdInput.value.trim();
+  const validId = /^\d{1,78}$/.test(requestedId)
+    && BigInt(requestedId) < storedAssessmentCount;
+  loadAssessmentButton.disabled = !validId;
 }
 
 async function submitReview(event) {
@@ -269,8 +320,31 @@ loadLatestButton.addEventListener('click', async () => {
     setActivity(error instanceof Error ? error.message : 'Could not load the latest assessment.', true);
   }
 });
+assessmentIdInput.addEventListener('input', updateAssessmentHistory);
+assessmentIdInput.addEventListener('keydown', (event) => {
+  if (event.key === 'Enter' && !loadAssessmentButton.disabled) {
+    event.preventDefault();
+    loadAssessmentButton.click();
+  }
+});
+loadAssessmentButton.addEventListener('click', () => {
+  const requestedId = assessmentIdInput.value.trim();
+  if (/^\d{1,78}$/.test(requestedId)) void loadAssessment(BigInt(requestedId));
+});
+previousAssessmentButton.addEventListener('click', () => {
+  if (activeAssessmentId !== null && activeAssessmentId > 0n) {
+    void loadAssessment(activeAssessmentId - 1n);
+  }
+});
+nextAssessmentButton.addEventListener('click', () => {
+  if (activeAssessmentId !== null && storedAssessmentCount !== null
+      && activeAssessmentId < storedAssessmentCount - 1n) {
+    void loadAssessment(activeAssessmentId + 1n);
+  }
+});
 
 if (activeAccount) walletStatus.textContent = `${activeAccount.slice(0, 6)}…${activeAccount.slice(-4)}`;
 else walletStatus.textContent = `Wallet not connected · ${networkTable[activeNetworkKey].label}`;
 updateFormState();
+updateAssessmentHistory();
 refreshContractSummary();

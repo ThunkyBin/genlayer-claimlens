@@ -6,8 +6,8 @@
     <meta name="theme-color" content="#f7f8f4" />
     <meta name="description" content="A cautious, evidence-first claim review powered by GenLayer validator consensus." />
     <title>ClaimLens — evidence, checked together</title>
-    <script type="module" crossorigin src="/genlayer-claimlens/assets/index-Cp3XgIxd.js"></script>
-    <link rel="stylesheet" crossorigin href="/genlayer-claimlens/assets/index-o1nrrkkM.css">
+    <script type="module" crossorigin src="/genlayer-claimlens/assets/index-Db30mYLH.js"></script>
+    <link rel="stylesheet" crossorigin href="/genlayer-claimlens/assets/index-BMp7A1Vg.css">
   </head>
   <body>
     <div id="app">
@@ -101,6 +101,21 @@
                 <p id="rationale" class="rationale"></p>
                 <div id="result-sources" class="result-sources"></div>
               </div>
+              <section id="assessment-history" class="assessment-history" hidden aria-labelledby="assessment-history-label">
+                <div class="assessment-history-head">
+                  <span id="assessment-history-label" class="footer-label">ASSESSMENT HISTORY</span>
+                  <span id="assessment-position" class="assessment-position" aria-live="polite"></span>
+                </div>
+                <div class="assessment-history-controls">
+                  <button id="previous-assessment" class="text-button" type="button" disabled>← Previous</button>
+                  <div class="history-lookup">
+                    <label class="visually-hidden" for="assessment-id-input">Assessment ID</label>
+                    <input id="assessment-id-input" type="text" inputmode="numeric" maxlength="78" autocomplete="off" placeholder="ID" aria-label="Assessment ID" />
+                    <button id="load-assessment" class="text-button" type="button" disabled>Load ID</button>
+                  </div>
+                  <button id="next-assessment" class="text-button" type="button" disabled>Next →</button>
+                </div>
+              </section>
               <div class="result-footer">
                 <div><span class="footer-label">ASSESSMENTS STORED</span><strong id="assessment-count">—</strong></div>
                 <button id="load-latest" class="text-button" type="button" disabled>Load latest <span aria-hidden="true">↗</span></button>

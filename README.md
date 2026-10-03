@@ -50,7 +50,7 @@ The local check script runs GenVM safety/SDK validation, type checking, and fast
 
 ## Web interface
 
-The static app is in `frontend/`. It supports read-only assessment lookup and lets a user submit a review through their own EIP-1193 wallet. It never stores wallet keys. Every write requires an explicit confirmation in the app; the wallet shows any required fee before the user approves the transaction.
+The static app is in `frontend/`. It supports read-only assessment lookup, including loading older on-chain assessments by ID, and lets a user submit a review through their own EIP-1193 wallet. Reading history does not need a wallet or create a transaction. The app never stores wallet keys. Every write requires an explicit confirmation in the app; the wallet shows any required fee before the user approves the transaction.
 
     cd frontend
     npm ci
