@@ -1,6 +1,7 @@
 import { createClient } from 'genlayer-js';
 import { testnetBradbury, testnetAsimov, studionet } from 'genlayer-js/chains';
 import { ExecutionResult, TransactionStatus } from 'genlayer-js/types';
+import { getAssessmentHistoryState } from './assessment-history.js';
 import './style.css';
 
 const networkTable = {
@@ -208,25 +209,16 @@ function showAssessment(record, id) {
 }
 
 function updateAssessmentHistory() {
-  const hasHistory = storedAssessmentCount !== null && storedAssessmentCount > 1n;
-  assessmentHistory.hidden = !hasHistory;
-  if (!hasHistory) {
-    assessmentPosition.textContent = '';
-    previousAssessmentButton.disabled = true;
-    loadAssessmentButton.disabled = true;
-    nextAssessmentButton.disabled = true;
-    return;
-  }
-
-  assessmentPosition.textContent = activeAssessmentId === null
-    ? `${storedAssessmentCount.toString()} stored`
-    : `Assessment ${(activeAssessmentId + 1n).toString()} of ${storedAssessmentCount.toString()} · ID ${activeAssessmentId.toString()}`;
-  previousAssessmentButton.disabled = activeAssessmentId === null || activeAssessmentId === 0n;
-  nextAssessmentButton.disabled = activeAssessmentId === null || activeAssessmentId >= storedAssessmentCount - 1n;
-  const requestedId = assessmentIdInput.value.trim();
-  const validId = /^\d{1,78}$/.test(requestedId)
-    && BigInt(requestedId) < storedAssessmentCount;
-  loadAssessmentButton.disabled = !validId;
+  const historyState = getAssessmentHistoryState({
+    storedCount: storedAssessmentCount,
+    activeId: activeAssessmentId,
+    requestedId: assessmentIdInput.value,
+  });
+  assessmentHistory.hidden = !historyState.visible;
+  assessmentPosition.textContent = historyState.position;
+  previousAssessmentButton.disabled = historyState.previousId === null;
+  nextAssessmentButton.disabled = historyState.nextId === null;
+  loadAssessmentButton.disabled = historyState.requestedAssessmentId === null;
 }
 
 async function submitReview(event) {
@@ -328,8 +320,12 @@ assessmentIdInput.addEventListener('keydown', (event) => {
   }
 });
 loadAssessmentButton.addEventListener('click', () => {
-  const requestedId = assessmentIdInput.value.trim();
-  if (/^\d{1,78}$/.test(requestedId)) void loadAssessment(BigInt(requestedId));
+  const { requestedAssessmentId } = getAssessmentHistoryState({
+    storedCount: storedAssessmentCount,
+    activeId: activeAssessmentId,
+    requestedId: assessmentIdInput.value,
+  });
+  if (requestedAssessmentId !== null) void loadAssessment(requestedAssessmentId);
 });
 previousAssessmentButton.addEventListener('click', () => {
   if (activeAssessmentId !== null && activeAssessmentId > 0n) {

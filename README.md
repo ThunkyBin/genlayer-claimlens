@@ -55,6 +55,7 @@ The static app is in `frontend/`. It supports read-only assessment lookup, inclu
     cd frontend
     npm ci
     npm run dev
+    npm test
 
 To publish without a GitHub Actions runner, build with `npm run build` from `frontend/`. Vite writes the GitHub Pages site to `docs/`; publish the `main` branch's `/docs` directory. For a Vercel root deployment, run `npm run build:vercel` from `frontend/` and deploy its `dist/` output. The app requires a ClaimLens contract deployed separately on the selected network; the Studionet test deployment is recorded below.
 
